@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>photoList</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        table, th, td {
+            border: 2px solid black;
+            font-size: 16px;
+            font-family: "Times New Roman", "微软雅黑", serif;
+            height: 30px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<table id="dataTable" style="text-align: center;">
+    <tr>
+        <th colspan="7">Photo Info</th>
+    </tr>
+    <tr>
+        <th>id</th>
+        <th>filename</th>
+        <th>creatTime</th>
+        <th>href</th>
+        <th>options(<a th:href="@{/}">Add</a>)</th>
+    </tr>
+    <tr th:each="photo : ${photos}">
+        <td th:text="${photo.id}"></td>
+        <td th:text="${photo.filename}"></td>
+        <td th:text="${photo.creatDate}"></td>
+        <td th:text="${basePath + photo.filename}"></td>
+        <td>
+            <a class="deleteA" @click="deletephoto" th:href="@{'/photo/'+${photo.id}}">delete</a>
+        </td>
+    </tr>
+</table>
+<!-- 作用：通过超链接控制表单的提交，将post请求转换为delete请求 -->
+<form id="delete_form" method="post">
+    <!-- HiddenHttpMethodFilter要求：必须传输_method请求参数，并且值为最终的请求方式 -->
+    <input type="hidden" name="_method" value="delete"/>
+</form>
+<script type="text/javascript" th:src="@{/static/js/vue.js}"></script>
+<script type="text/javascript">
+    const vue = new Vue({
+        el: "#dataTable",
+        methods: {
+            //event表示当前事件
+            deletephoto: function (event) {
+                //通过id获取表单标签
+                var delete_form = document.getElementById("delete_form");
+                //将触发事件的超链接的href属性为表单的action属性赋值
+                delete_form.action = event.target.href;
+                //提交表单
+                delete_form.submit();
+                //阻止超链接的默认跳转行为
+                event.preventDefault();
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--  扫描组件,排除Controller层组件  -->
+    <context:component-scan base-package="com.shxiaj.ssm">
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <!--  导入jdbc配置文件  -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!--  配置Druid数据库连接池  -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--  配置sqlSessionFactory  -->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--   注入dataSource   -->
+        <property name="dataSource" ref="dataSource"/>
+        <!--   配置mybatis.xml文件     -->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+    </bean>
+    <!--  为Mapper创建Bean实现类对象  -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.shxiaj.ssm.mapper"/>
+    </bean>
+    <!--  配置上传文件转换对象  -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+    <!--  声明式事务控制  -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--开启事务注解-->
+    <!--    <tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <!-- 哪些方法需要Spring开启事务
+            transaction-manager="transactionManager":指定事务管理器
+            通知类型:Spring帮我们写好
+         -->
+    <tx:advice transaction-manager="transactionManager" id="txAdvice">
+        <tx:attributes>
+            <!--
+                REQUIRED:需要开启事务
+                rollback-for:抛出哪些异常需要Spring回滚
+                name="save*":以save开头的要开启事务
+                rollback-for:抛出哪类异常(以及子类)的时候,Spring事务回滚,默认是RunTimeException
+             -->
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>
+            <!--            <tx:method name="*" read-only="true"/>-->
+            <tx:method name="*" propagation="REQUIRED" rollback-for="Exception"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 配置AOP,
+		目的:哪些类里面的哪些方法执行事务管理器
+	 -->
+    <aop:config>
+        <!-- 定义哪些类执行事务管理器
+        推荐放到实现类上面(Service)
+         -->
+        <aop:pointcut expression="execution(* com.shxiaj.ssm.service.impl.*.*(..))" id="pointcut"/>
+        <!-- 将事务管理器和横切面(pointcut)关联起来 -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+    </aop:config>
+</beans>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UserAdd</title>
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+            width: 40%;
+        }
+
+        table, th, td {
+            border: 2px solid black;
+            font-size: 16px;
+            font-family: "Times New Roman", "微软雅黑", serif;
+            height: 30px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<form th:action="@{/user}" method="post">
+    姓名: <input type="text" name="username"><br>
+    密码: <input type="text" name="password"><br>
+    年龄: <input type="text" name="age"><br>
+    邮箱: <input type="text" name="email"><br>
+    性别：<input type="radio" name="sex" value="男">male <input type="radio" name="gender" value="女">female<br>
+    <input type="submit" value="add"><br>
+</form>
+</body>
+</html>

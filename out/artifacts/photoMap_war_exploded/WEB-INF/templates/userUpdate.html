@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>UserUpdate</title>
+</head>
+<body>
+<form th:action="@{/user}" method="post">
+    <input type="hidden" name="_method" value="put">
+    <input type="hidden" name="id" th:value="${user.id}">
+    姓名: <input type="text" name="username" th:value="${user.username}"><br>
+    密码: <input type="text" name="password" th:value="${user.password}"><br>
+    年龄: <input type="text" name="age" th:value="${user.age}"><br>
+    邮箱: <input type="text" name="email" th:value="${user.email}"><br>
+    性别：<input type="radio" name="sex" value="男" th:field="${user.sex}">male
+         <input type="radio" name="gender" value="女" th:field="${user.sex}">female<br>
+    <!--
+        th:field="${user.gender}"可用于单选框或复选框的回显
+        若单选框的value和user.gender的值一致，则添加checked="checked"属性
+    -->
+    <input type="submit" value="update"><br>
+</form>
+</body>
+</html>
